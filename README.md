@@ -1,18 +1,24 @@
 # KswCarData
 
-A new flutter plugin project.
+Flutter plugin to get CarData from the MCU on KSW-android car headunits (with snapdragon 625) using Logcat entries from the IPowerManagerAppService.
+Based on work on MCU Logcat decoding by [Snaggle](https://github.com/snaggly)
 
-## Getting Started
+## Usage
+Call `KswCarData.carDataStream` to access the broadcast stream of the car status.
+Then cast to `List<String>` and create a `CarData` object.
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+Available values include:
+- Outside temperature
+- Average speed
+- Car door status
+- Engine rpm
+- Fueltank contents
+- Remaining range
+- Seatbelt status
+- Current speed
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Installation
+The included example app shows the live data on-screen
+Simply grant your app the READ_LOGS permission to allow it to read the logcat entries.
 
-The plugin project was generated without specifying the `--platforms` flag, no platforms are currently supported.
-To add platforms, run `flutter create -t plugin --platforms <platforms> .` under the same
-directory. You can also find a detailed instruction on how to add platforms in the `pubspec.yaml` at https://flutter.dev/docs/development/packages-and-plugins/developing-packages#plugin-platforms.
+`adb shell pm grant dev.wits.kswcardata_example android.permission.READ_LOGS`

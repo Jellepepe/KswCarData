@@ -1,7 +1,7 @@
 name: KswCarData
-description: A new flutter plugin project.
+description: Read Live car data on KSW-android car headunits.
 version: 0.0.1
-author:
+author: Jellepepe
 homepage:
 
 environment:
@@ -27,14 +27,9 @@ flutter:
   # adding or updating assets for this project.
   plugin:
     platforms:
-    # This plugin project was generated without specifying any
-    # platforms with the `--platform` argument. If you see the `fake_platform` map below, remove it and
-    # then add platforms following the instruction here:
-    # https://flutter.dev/docs/development/packages-and-plugins/developing-packages#plugin-platforms
-    # -------------------
-      some_platform:
-        pluginClass: somePluginClass
-    # -------------------
+      android:
+        package: dev.wits.kswcardata
+        pluginClass: KswCarDataPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
