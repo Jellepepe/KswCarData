@@ -12,7 +12,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  CarData _carData = new CarData.failed('Not loaded yet.');
+  //CarData _carData = new CarData.failed('Not loaded yet.');
   bool _runningStatus = false;
   final random = Random();
 
@@ -22,12 +22,12 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  Future<void> _getCarData() async {
+  /*Future<void> _getCarData() async {
     final CarData carStatus = await KswCarData.getCarData();
     setState(() {
       _carData = carStatus;
     });
-  }
+  }*/
 
   Future<void> _getRunningStatus() async {
     final CarData carStatus = await KswCarData.getCarData();
@@ -112,14 +112,38 @@ class _MyAppState extends State<MyApp> {
                       ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 20, left: 20),
+                    padding: EdgeInsets.only(left: 20),
                     child: StreamBuilder(
-                      stream: KswCarData.carDataStream,
+                      stream: KswCarData.rpmStream,
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         print(snapshot);
                         if(snapshot.hasData) {
                           return Text(
-                            CarData(List<String>.from(snapshot.data)).toString(),
+                            'RPM: ' + snapshot.data.toString(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                            ),
+                          );
+                        }
+                        return Text(
+                          'RPM: Unknown',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32
+                          ),
+                        );
+                      }
+                    )
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20, left: 20),
+                    child: StreamBuilder(
+                      stream: KswCarData.carDataStream,
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if(snapshot.hasData) {
+                          return Text(
+                            snapshot.data.toString(),
                             style: TextStyle(
                               color: Colors.grey,
                             ),

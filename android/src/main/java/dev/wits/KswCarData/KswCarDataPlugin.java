@@ -93,10 +93,11 @@ public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamH
             carStatus.add(cardata[7].split(",")[0]);
             carStatus.add(cardata[8].split(",")[0]);
             carStatus.add(cardata[9].split(",")[0]);
+            carStatus.add(cardata[10].split(",")[0]);
             carStatus.add(cardata[11].split(",")[0]);
             carStatus.add(cardata[12].split(",")[0]);
             carStatus.add(cardata[13].split(",")[0].replace("}",""));
-            carStatus.add(cardata[14].split(",")[0]);
+            carStatus.add(cardata[14].split(",")[0].replace("\\u0000",""));
             for(Map.Entry<Object, EventChannel.EventSink> entry : listeners.entrySet()) {
                 entry.getValue().success(carStatus);
             }

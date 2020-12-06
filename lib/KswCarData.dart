@@ -15,14 +15,21 @@ class KswCarData {
 
   static const _carDataChannel = const EventChannel('dev.wits.kswcardata/carStream');
 
-  static Stream<dynamic> _carDataStream;
+  static Stream<dynamic> _rawCarDataStream;
 
-  static Stream<dynamic> get carDataStream {
-    _carDataStream = 
-      _carDataChannel.receiveBroadcastStream(1);
-    print(_carDataStream);
+  static Stream<CarData> get carDataStream {
+    if(_rawCarDataStream == null) {
+      _rawCarDataStream = _carDataChannel.receiveBroadcastStream(1);
+    }
+    return _rawCarDataStream.map((cardata) => CarData(List<String>.from(cardata)));
+  }
 
-    return _carDataStream;
+  static Stream<double> get speedStream {
+    return carDataStream.map((cardata) => cardata.speed);
+  }
+
+  static Stream<int> get rpmStream {
+    return carDataStream.map((cardata) => cardata.rpm);
   }
 
   static Future<bool> getRecordingStatus() async {
@@ -54,7 +61,6 @@ class KswCarData {
     } on PlatformException catch (e) {
       carStatus = ["Failed to get logs: '${e.message}'."];
     }
-    debugPrint(carStatus.toString());
     if (carStatus.length >= 13) {
       return CarData(carStatus);
     } else if(carStatus.length >= 1) {
@@ -73,9 +79,10 @@ class CarData {
   int distanceUnit;
   int rpm;
   bool handbrake; 
-  int mileage;
-  double gas; 
-  int gasUnit;
+  int range;
+  double fuel; 
+  int fuelUnit;
+  double consumption;
   bool seatbelt;
   double speed;
   int tempUnit;
@@ -89,13 +96,14 @@ class CarData {
     this.distanceUnit  = int.parse(carStatus[3]);
     this.rpm           = int.parse(carStatus[4]);
     this.handbrake     = carStatus[5].toLowerCase() == 'true';
-    this.mileage       = int.parse(carStatus[6]);
-    this.gas           = double.parse(carStatus[7]);
-    this.gasUnit       = int.parse(carStatus[8]);
-    this.seatbelt      = carStatus[9].toLowerCase() == 'true';
-    this.speed         = double.parse(carStatus[10]);
-    this.tempUnit      = int.parse(carStatus[11]);
-    this.mcuVersion    = carStatus[12];
+    this.range         = int.parse(carStatus[6]);
+    this.fuel          = double.parse(carStatus[7]);
+    this.fuelUnit      = int.parse(carStatus[8]);
+    this.consumption   = double.parse(carStatus[9]);
+    this.seatbelt      = carStatus[10].toLowerCase() == 'true';
+    this.speed         = double.parse(carStatus[11]);
+    this.tempUnit      = int.parse(carStatus[12]);
+    this.mcuVersion    = carStatus[13];
   }
 
   CarData.failed(String error) {
@@ -112,16 +120,17 @@ class CarData {
       return "No car data available. Error:\n" + error;
     } else {
       return "Car Data:\n"
-        + "Temperature: " + this.temperature.toString() + '\n'
+        + "Outside Temperature: " + this.temperature.toString() + '\n'
         + "Average Speed: " + this.averageSpeed.toString() + '\n'
-        + "Car door value: " + this.cardoor.toString() + '\n'
+        + "Car Door value: " + this.cardoor.toString() + '\n'
         + "Distance Unit: " + this.distanceUnit.toString() + '\n'
         + "RPM: " + this.rpm.toString() + '\n'
-        + "Handbrake status: " + this.handbrake.toString() + '\n'
-        + "Mileage: " + this.mileage.toString() + '\n'
-        + "Gas: " + this.gas.toString() + '\n'
-        + "Gas Unit: " + this.gasUnit.toString() + '\n'
-        + "Seatbelt status: " + this.seatbelt.toString() + '\n'
+        + "Handbrake on: " + this.handbrake.toString() + '\n'
+        + "Range: " + this.range.toString() + '\n'
+        + "Fuel Tank Contents: " + this.fuel.toString() + '\n'
+        + "Fuel Unit: " + this.fuelUnit.toString() + '\n'
+        + "Fuel Consumption: " + this.consumption.toString() + '\n'
+        + "Seatbelt on: " + this.seatbelt.toString() + '\n'
         + "Speed: " + this.speed.toString() + '\n'
         + "Temperature Unit: " + this.tempUnit.toString() + '\n'
         + "MCU Version: " + this.mcuVersion.toString() + '\n';
