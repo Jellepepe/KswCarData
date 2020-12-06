@@ -1,7 +1,7 @@
 # KswCarData
 
 Flutter plugin to get CarData from the MCU on KSW-android car headunits (with snapdragon 625) using Logcat entries from the IPowerManagerAppService.
-Based on work on MCU Logcat decoding by [Snaggle](https://github.com/snaggly)
+Based on work on MCU Logcat decoding by [daschacka](https://github.com/daschacka)
 
 ## Usage
 Call `KswCarData.carDataStream` to access the broadcast stream of the car status.
