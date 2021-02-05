@@ -2,6 +2,8 @@ package dev.wits.kswcardata;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.app.Activity;
+import android.provider.Settings;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  */
 public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamHandler {
 
+    private final Activity activity;
     private Process continuousLogging;
     private boolean recording = false;
     private ArrayList<String> log;
@@ -35,12 +38,16 @@ public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamH
      * Plugin registration
      */
     public static void registerWith(Registrar registrar) {
-      KswCarDataPlugin plugin = new KswCarDataPlugin();
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "dev.wits.kswcardata");
-        channel.setMethodCallHandler(plugin);
+      final MethodChannel channel = new MethodChannel(registrar.messenger(), "dev.wits.kswcardata");
+      KswCarDataPlugin plugin = new KswCarDataPlugin(registrar.activity());
+      channel.setMethodCallHandler(plugin);
 
-        final EventChannel streamChannel = new EventChannel(registrar.messenger(), "dev.wits.kswcardata/carStream");
-        streamChannel.setStreamHandler(plugin);
+      final EventChannel streamChannel = new EventChannel(registrar.messenger(), "dev.wits.kswcardata/carStream");
+      streamChannel.setStreamHandler(plugin);
+    }
+
+    private KswCarDataPlugin(Activity activity) {
+        this.activity = activity;
     }
 
     @Override
@@ -98,6 +105,7 @@ public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamH
             carStatus.add(cardata[12].split(",")[0]);
             carStatus.add(cardata[13].split(",")[0].replace("}",""));
             carStatus.add(cardata[14].split(",")[0].replace("\\u0000",""));
+            carStatus.add(String.valueOf(Settings.System.getInt(activity.getContentResolver(), "ksw_bluetooth", 0)));
             for(Map.Entry<Object, EventChannel.EventSink> entry : listeners.entrySet()) {
                 entry.getValue().success(carStatus);
             }

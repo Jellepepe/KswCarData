@@ -23,6 +23,7 @@ Available values include:
 - Seatbelt status
 - Current speed
 - MCU version
+- Bluetooth Connection status (with phone)
 
 ### Installation
 The included example app shows the live data on-screen

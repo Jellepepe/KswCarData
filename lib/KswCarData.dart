@@ -61,7 +61,7 @@ class KswCarData {
     } on PlatformException catch (e) {
       carStatus = ["Failed to get logs: '${e.message}'."];
     }
-    if (carStatus.length >= 13) {
+    if (carStatus.length >= 14) {
       return CarData(carStatus);
     } else if(carStatus.length >= 1) {
       return CarData.failed(carStatus[0]);
@@ -87,6 +87,7 @@ class CarData {
   double speed;
   int tempUnit;
   String mcuVersion;
+  bool btStatus;
 
   CarData(List<String> carStatus) {
     this.error = "";
@@ -104,6 +105,7 @@ class CarData {
     this.speed         = double.parse(carStatus[11]);
     this.tempUnit      = int.parse(carStatus[12]);
     this.mcuVersion    = carStatus[13];
+    this.btStatus      = int.parse(carStatus[14]) == 1;
   }
 
   CarData.failed(String error) {
@@ -133,7 +135,8 @@ class CarData {
         + "Seatbelt on: " + this.seatbelt.toString() + '\n'
         + "Speed: " + this.speed.toString() + '\n'
         + "Temperature Unit: " + this.tempUnit.toString() + '\n'
-        + "MCU Version: " + this.mcuVersion.toString() + '\n';
+        + "MCU Version: " + this.mcuVersion.toString() + '\n'
+        + "Bluetooth status: " + this.btStatus.toString() +'\n';
     }
   }
 }
