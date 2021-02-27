@@ -1,8 +1,8 @@
 name: KswCarData
 description: Read Live car data on KSW-android car headunits.
-version: 0.1.2
+version: 0.2.0
 author: Jellepepe
-homepage: byme.dev
+homepage: byme.dev/kswcardata
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
