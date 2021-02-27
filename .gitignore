@@ -3,5 +3,8 @@
 
 .packages
 .pub/
+.vscode/
+*.lock
+*.project
 
 build/
