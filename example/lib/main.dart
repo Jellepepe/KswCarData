@@ -181,7 +181,7 @@ class _MyAppState extends State<MyApp> {
                                 );
                               }
                               return Text(
-                                'No data',
+                                _carStatus.toString(),
                                 style: TextStyle(
                                   color: Colors.white,
                                 ),

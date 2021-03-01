@@ -1,3 +1,7 @@
+## 0.2.1
+Renamed package from dev.wits to dev.byme  
+Improved error handling  
+
 ## 0.2.0
 Reworked the plugin to interface directly with KSW services through AIDL/IPC  
 Logcat permission no longer needed  

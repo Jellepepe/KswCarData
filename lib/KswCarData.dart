@@ -9,9 +9,9 @@ import 'package:flutter/services.dart';
 
 /// Plugin for fetching the app logs
 class KswCarData {
-  static const _methodChannel = const MethodChannel('dev.wits.kswcardata');
+  static const _methodChannel = const MethodChannel('dev.byme.kswcardata');
 
-  static const _carDataChannel = const EventChannel('dev.wits.kswcardata/carStream');
+  static const _carDataChannel = const EventChannel('dev.byme.kswcardata/carStream');
 
   static Stream<dynamic> _rawCarDataStream;
 

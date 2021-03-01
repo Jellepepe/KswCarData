@@ -1,4 +1,4 @@
-package dev.wits.KswCarData_example;
+package dev.byme.kswcardata_example;
 
 import io.flutter.embedding.android.FlutterActivity;
 

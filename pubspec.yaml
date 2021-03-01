@@ -1,6 +1,6 @@
 name: KswCarData
 description: Read Live car data on KSW-android car headunits.
-version: 0.2.0
+version: 0.2.1
 author: Jellepepe
 homepage: byme.dev/kswcardata
 
@@ -28,7 +28,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: dev.wits.kswcardata
+        package: dev.byme.kswcardata
         pluginClass: KswCarDataPlugin
 
   # To add assets to your plugin package, add an assets section, like this:

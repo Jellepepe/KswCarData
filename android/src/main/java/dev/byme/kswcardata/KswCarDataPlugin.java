@@ -4,7 +4,7 @@
  * found in the LICENSE file.
  */
 
-package dev.wits.kswcardata;
+package dev.byme.kswcardata;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -82,11 +82,11 @@ public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamH
      * Plugin registration
      */
     public static void registerWith(Registrar registrar) {
-      final MethodChannel channel = new MethodChannel(registrar.messenger(), "dev.wits.kswcardata");
+      final MethodChannel channel = new MethodChannel(registrar.messenger(), "dev.byme.kswcardata");
       KswCarDataPlugin plugin = new KswCarDataPlugin(registrar.activity());
       channel.setMethodCallHandler(plugin);
 
-      final EventChannel streamChannel = new EventChannel(registrar.messenger(), "dev.wits.kswcardata/carStream");
+      final EventChannel streamChannel = new EventChannel(registrar.messenger(), "dev.byme.kswcardata/carStream");
       streamChannel.setStreamHandler(plugin);
     }
 
@@ -105,10 +105,11 @@ public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamH
         if(call.method.equals("getCarData")) {
             try{
                 onNewLogEntry(getWitsManager().getStatusString("mcuJson"));
+                result.success(carStatus);
             } catch (Exception e){
-                Log.e("KswCarData","Error Fetching CarStatus manually",e);
+                Log.e("KswCarData","Error Fetching CarStatus manually");
+                result.error("UNAVAILABLE","Ksw services unavailable or IPC connection failed.", null);
             }
-            result.success(carStatus);
         } else if(call.method.equals("testCarData")) {
             onNewLogEntry(test_data());
         } else {

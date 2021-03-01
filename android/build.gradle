@@ -1,4 +1,4 @@
-group 'dev.wits.KswCarData'
+group 'dev.byme.kswcardata'
 version '1.0'
 
 buildscript {
