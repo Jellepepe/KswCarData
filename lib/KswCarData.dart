@@ -13,49 +13,37 @@ class KswCarData {
 
   static const _carDataChannel = const EventChannel('dev.byme.kswcardata/carStream');
 
-  static Stream<dynamic> _rawCarDataStream;
+  static Stream<dynamic> _rawCarDataStream = _carDataChannel.receiveBroadcastStream(1);
 
   static Stream<dynamic> get rawCarDataStream {
-    if(_rawCarDataStream == null) {
-      _rawCarDataStream = _carDataChannel.receiveBroadcastStream(1);
-    }
     return _rawCarDataStream;
   }
 
   static Stream<CarData> get carDataStream {
-    if(_rawCarDataStream == null) {
-      _rawCarDataStream = _carDataChannel.receiveBroadcastStream(1);
-    }
     return _rawCarDataStream.map((cardata) => CarData.fromJson(jsonDecode(cardata)));
   }
 
-  static Stream<int> get speedStream {
+  static Stream<int?> get speedStream {
     return carDataStream.map((cardata) => cardata.speed);
   }
 
-  static Stream<int> get rpmStream {
+  static Stream<int?> get rpmStream {
     return carDataStream.map((cardata) => cardata.rpm);
   }
 
   static Future<CarData> getCarData() async {
-    String carStatus;
     try {
-      carStatus = await _methodChannel.invokeMethod('getCarData');
-      return CarData.fromJson(carStatus);
+      return CarData.fromJson(await _methodChannel.invokeMethod('getCarData'));
     } on PlatformException catch (e) {
-      carStatus = "Failed to get car status: '${e.message}'.";
-      return CarData.failed(carStatus);
+      return CarData.failed("Failed to get car status: '${e.message}'.");
     }
   }
 
   static Future<CarData> testCarData() async {
-    String carStatus;
     try {
-      carStatus = await _methodChannel.invokeMethod('testCarData');
-      return CarData.fromJson(carStatus);
+      return CarData.fromJson(await _methodChannel.invokeMethod('testCarData'));
     } on PlatformException catch (e) {
-      carStatus = "Failed to get car status: '${e.message}'.";
-      return CarData.failed(carStatus);
+      return CarData.failed("Failed to get car status: '${e.message}'.");
     }
   }
 }
@@ -68,61 +56,42 @@ class CarData {
   static const int REAR_LEFT = 64;
   static const int REAR_RIGHT = 128;
 
-  bool isOpen(int door) => (cardoor & door) != 0; 
+  bool isOpen(int door) => (cardoor! & door) != 0; 
 
   String error = 'Empty';
-  double temperature;
-  double averageSpeed;
-  int cardoor;
-  int distanceUnit;
-  int rpm;
-  bool handbrake; 
-  int range;
-  int fuel; 
-  int fuelUnit;
-  double consumption;
-  bool seatbelt;
-  int speed;
-  int tempUnit;
-  String mcuVersion;
-  bool btStatus;
-
-  CarData(List<String> carStatus) {
-    this.error = "";
-    this.temperature   = double.parse(carStatus[0]);
-    this.averageSpeed  = double.parse(carStatus[1]);
-    this.cardoor       = int.parse(carStatus[2]);
-    this.distanceUnit  = int.parse(carStatus[3]);
-    this.rpm           = int.parse(carStatus[4]);
-    this.handbrake     = carStatus[5].toLowerCase() == 'true';
-    this.range         = int.parse(carStatus[6]);
-    this.fuel          = int.parse(carStatus[7]);
-    this.fuelUnit      = int.parse(carStatus[8]);
-    this.consumption   = double.parse(carStatus[9]);
-    this.seatbelt      = carStatus[10].toLowerCase() == 'true';
-    this.speed         = int.parse(carStatus[11]);
-    this.tempUnit      = int.parse(carStatus[12]);
-    this.mcuVersion    = carStatus[13];
-    this.btStatus      = int.parse(carStatus[14]) == 1;
-  }
+  double? temperature;
+  double? averageSpeed;
+  int? cardoor;
+  int? distanceUnit;
+  int? rpm;
+  bool? handbrake; 
+  int? range;
+  int? fuel; 
+  int? fuelUnit;
+  double? consumption;
+  bool? seatbelt;
+  int? speed;
+  int? tempUnit;
+  String? mcuVersion;
+  late bool btStatus;
 
   CarData.fromJson(dynamic json) {
     dynamic carStatus = json['carData'];
     this.error = "";
-    this.temperature   = carStatus['airTemperature'] as double;
-    this.averageSpeed  = carStatus['averSpeed'] as double;
-    this.cardoor       = carStatus['carDoor'] as int;
-    this.distanceUnit  = carStatus['distanceUnitType'] as int;
-    this.rpm           = carStatus['engineTurnS'] as int;
-    this.handbrake     = carStatus['handbrake']as bool;
-    this.range         = carStatus['mileage'] as int;
-    this.fuel          = carStatus['oilSum'] as int;
-    this.fuelUnit      = carStatus['oilUnitType'] as int;
-    this.consumption   = carStatus['oilWear'] as double;
-    this.seatbelt      = carStatus['safetyBelt'] as bool;
-    this.speed         = carStatus['speed'] as int;
-    this.tempUnit      = carStatus['temperatureUnitType'] as int;
-    this.mcuVersion    = json['mcuVerison'] as String;
+    this.temperature   = carStatus['airTemperature'] as double?;
+    this.averageSpeed  = carStatus['averSpeed'] as double?;
+    this.cardoor       = carStatus['carDoor'] as int?;
+    this.distanceUnit  = carStatus['distanceUnitType'] as int?;
+    this.rpm           = carStatus['engineTurnS'] as int?;
+    this.handbrake     = carStatus['handbrake']as bool?;
+    this.range         = carStatus['mileage'] as int?;
+    this.fuel          = carStatus['oilSum'] as int?;
+    this.fuelUnit      = carStatus['oilUnitType'] as int?;
+    this.consumption   = carStatus['oilWear'] as double?;
+    this.seatbelt      = carStatus['safetyBelt'] as bool?;
+    this.speed         = carStatus['speed'] as int?;
+    this.tempUnit      = carStatus['temperatureUnitType'] as int?;
+    this.mcuVersion    = json['mcuVerison'] as String?;
     this.btStatus      = json['bluetooth'] as int == 1;
     assert(() {
       print("Parsed CarData from Json: " + this.toString());

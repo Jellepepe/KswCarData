@@ -1,12 +1,11 @@
-name: KswCarData
+name: kswcardata
 description: Read Live car data on KSW-android car headunits.
-version: 0.2.1
+version: 0.3.0
 author: Jellepepe
 homepage: byme.dev/kswcardata
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.20.0 <2.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   flutter:

@@ -4,7 +4,7 @@
 
 import 'dart:math';
 
-import 'package:KswCarData/KswCarData.dart';
+import 'package:kswcardata/kswcardata.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -16,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  CarData _carStatus;
+  CarData _carStatus = CarData.failed("Empty");
   final random = Random();
 
   @override
@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
                       icon: Icon(Icons.warning),
                       onPressed: () {
                         _testCarStatus();
-                        Scaffold.of(context).showSnackBar(
+                        ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Fetching Test Data"),
                           )
@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                       icon: Icon(Icons.sync_problem),
                       onPressed: () {
                         _getCarStatus();
-                        Scaffold.of(context).showSnackBar(
+                        ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Fetching Data Manually"),
                           )
