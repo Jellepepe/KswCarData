@@ -64,35 +64,39 @@ class CarData {
   int? cardoor;
   int? distanceUnit;
   int? rpm;
-  bool? handbrake; 
+  bool handbrake = false; 
   int? range;
   int? fuel; 
   int? fuelUnit;
   double? consumption;
-  bool? seatbelt;
+  bool seatbelt = true;
   int? speed;
   int? tempUnit;
   String? mcuVersion;
-  late bool btStatus;
+  bool btStatus = false;
 
   CarData.fromJson(dynamic json) {
     dynamic carStatus = json['carData'];
     this.error = "";
+    try{
     this.temperature   = carStatus['airTemperature'] as double?;
     this.averageSpeed  = carStatus['averSpeed'] as double?;
     this.cardoor       = carStatus['carDoor'] as int?;
     this.distanceUnit  = carStatus['distanceUnitType'] as int?;
     this.rpm           = carStatus['engineTurnS'] as int?;
-    this.handbrake     = carStatus['handbrake']as bool?;
+    this.handbrake     = carStatus['handbrake'] as bool;
     this.range         = carStatus['mileage'] as int?;
     this.fuel          = carStatus['oilSum'] as int?;
     this.fuelUnit      = carStatus['oilUnitType'] as int?;
     this.consumption   = carStatus['oilWear'] as double?;
-    this.seatbelt      = carStatus['safetyBelt'] as bool?;
+    this.seatbelt      = carStatus['safetyBelt'] as bool;
     this.speed         = carStatus['speed'] as int?;
     this.tempUnit      = carStatus['temperatureUnitType'] as int?;
     this.mcuVersion    = json['mcuVerison'] as String?;
     this.btStatus      = json['bluetooth'] as int == 1;
+    } catch(e) {
+      this.error = "Incomplete carData, error was:\n" + e.toString();
+    }
     assert(() {
       print("Parsed CarData from Json: " + this.toString());
       return true;
