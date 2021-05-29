@@ -14,10 +14,14 @@ import android.util.Log;
 import android.app.Activity;
 import android.provider.Settings;
 
+import androidx.annotation.NonNull;
+
 import java.io.InputStreamReader;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.HashMap;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.*;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.EventChannel;
@@ -32,7 +36,7 @@ import com.wits.pms.IPowerManagerAppService;
 /**
  * KswCarDataPlugin
  */
-public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamHandler {
+public class KswCarDataPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler, EventChannel.StreamHandler {
 
     private static String test_data() {
         return "{\"carData\":{\"airTemperature\":0.0,\"averSpeed\":0.0,\"carDoor\":80,\"carGear\":0,\"distanceUnitType\":0,\"engineTurnS\":"
@@ -42,8 +46,10 @@ public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamH
         + ",\"temperatureUnitType\":0},\"mcuVerison\":\"023052dGS-CIC-GTL-200617-B18\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\",\"systemMode\":0}";
     }
 
-    private final Activity activity;
+    private Activity activity;
     private String carStatus;
+    private MethodChannel channel;
+    private EventChannel streamChannel;
 
     private HashMap<Object, EventChannel.EventSink> listeners = new HashMap<>();
 
@@ -81,27 +87,47 @@ public class KswCarDataPlugin implements MethodCallHandler, EventChannel.StreamH
     /**
      * Plugin registration
      */
-    public static void registerWith(Registrar registrar) {
-      final MethodChannel channel = new MethodChannel(registrar.messenger(), "dev.byme.kswcardata");
-      KswCarDataPlugin plugin = new KswCarDataPlugin(registrar.activity());
-      channel.setMethodCallHandler(plugin);
 
-      final EventChannel streamChannel = new EventChannel(registrar.messenger(), "dev.byme.kswcardata/carStream");
-      streamChannel.setStreamHandler(plugin);
-    }
-
-    private KswCarDataPlugin(Activity activity) {
-        this.activity = activity;
-        try{
-            getWitsManager().registerCmdListener(cmdListener);
-            getWitsManager().registerObserver("mcuJson", contentObserver);
-        } catch (Exception e){
-            Log.e("KswCarData","Error Attaching Listeners",e);
-        }
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+      channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.byme.kswcardata");
+      streamChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "dev.byme.kswcardata/carStream");
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+      this.activity = binding.getActivity();
+      try{
+        getWitsManager().registerCmdListener(cmdListener);
+        getWitsManager().registerObserver("mcuJson", contentObserver);
+      } catch (Exception e){
+        Log.e("KswCarData","Error Attaching Listeners",e);
+      }
+      channel.setMethodCallHandler(this);
+      streamChannel.setStreamHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        onDetachedFromActivity();
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        onAttachedToActivity(binding);
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        channel.setMethodCallHandler(null);
+        streamChannel.setStreamHandler(null);
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {}
+
+    @Override
+    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         if(call.method.equals("getCarData")) {
             try{
                 onNewLogEntry(getWitsManager().getStatusString("mcuJson"));

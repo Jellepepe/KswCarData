@@ -1,3 +1,6 @@
+## 0.4.0
+- Migrated to new PluginApi
+
 ## 0.3.0
 - Migrated to nullsafety
 - Small cleanup
