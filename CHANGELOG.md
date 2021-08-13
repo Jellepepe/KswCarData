@@ -1,3 +1,8 @@
+## 0.4.1
+- Actually use .aidl files properly
+- Bugfixes for null-safety
+- More robust error handling
+
 ## 0.4.0
 - Migrated to new PluginApi
 

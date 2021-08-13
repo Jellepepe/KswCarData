@@ -33,9 +33,9 @@ class KswCarData {
 
   static Future<CarData> getCarData() async {
     try {
-      return CarData.fromJson(await _methodChannel.invokeMethod('getCarData'));
-    } on PlatformException catch (e) {
-      return CarData.failed("Failed to get car status: '${e.message}'.");
+      return CarData.fromJson(jsonDecode(await _methodChannel.invokeMethod('getCarData')));
+    } catch (e) {
+      return CarData.failed("Failed to get car status: '${e.toString()}'.");
     }
   }
 
@@ -76,26 +76,30 @@ class CarData {
   bool btStatus = false;
 
   CarData.fromJson(dynamic json) {
-    dynamic carStatus = json['carData'];
-    this.error = "";
-    try{
-    this.temperature   = carStatus['airTemperature'] as double?;
-    this.averageSpeed  = carStatus['averSpeed'] as double?;
-    this.cardoor       = carStatus['carDoor'] as int?;
-    this.distanceUnit  = carStatus['distanceUnitType'] as int?;
-    this.rpm           = carStatus['engineTurnS'] as int?;
-    this.handbrake     = carStatus['handbrake'] as bool;
-    this.range         = carStatus['mileage'] as int?;
-    this.fuel          = carStatus['oilSum'] as int?;
-    this.fuelUnit      = carStatus['oilUnitType'] as int?;
-    this.consumption   = carStatus['oilWear'] as double?;
-    this.seatbelt      = carStatus['safetyBelt'] as bool;
-    this.speed         = carStatus['speed'] as int?;
-    this.tempUnit      = carStatus['temperatureUnitType'] as int?;
-    this.mcuVersion    = json['mcuVerison'] as String?;
-    this.btStatus      = json['bluetooth'] as int == 1;
-    } catch(e) {
-      this.error = "Incomplete carData, error was:\n" + e.toString();
+    if(json == null) {
+      this.error = "Received null from native side.";
+    } else {
+      dynamic carStatus = json['carData'];
+      this.error = "";
+      try {
+        this.temperature   = carStatus['airTemperature'] as double?;
+        this.averageSpeed  = carStatus['averSpeed'] as double?;
+        this.cardoor       = carStatus['carDoor'] as int?;
+        this.distanceUnit  = carStatus['distanceUnitType'] as int?;
+        this.rpm           = carStatus['engineTurnS'] as int?;
+        this.handbrake     = carStatus['handbrake'] as bool;
+        this.range         = carStatus['mileage'] as int?;
+        this.fuel          = carStatus['oilSum'] as int?;
+        this.fuelUnit      = carStatus['oilUnitType'] as int?;
+        this.consumption   = carStatus['oilWear'] as double?;
+        this.seatbelt      = carStatus['safetyBelt'] as bool;
+        this.speed         = carStatus['speed'] as int?;
+        this.tempUnit      = carStatus['temperatureUnitType'] as int?;
+        this.mcuVersion    = json['mcuVerison'] as String?;
+        this.btStatus      = (json['bluetooth'] as int?) == 1;
+      } catch(e) {
+        this.error = "Incomplete carData, error was:\n" + e.toString();
+      }
     }
     assert(() {
       print("Parsed CarData from Json: " + this.toString());

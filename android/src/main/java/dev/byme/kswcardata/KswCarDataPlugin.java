@@ -100,6 +100,7 @@ public class KswCarDataPlugin implements FlutterPlugin, ActivityAware, MethodCal
       try{
         getWitsManager().registerCmdListener(cmdListener);
         getWitsManager().registerObserver("mcuJson", contentObserver);
+        Log.i("KswCarData", "Listeners attached successfully");
       } catch (Exception e){
         Log.e("KswCarData","Error Attaching Listeners",e);
       }
@@ -128,19 +129,25 @@ public class KswCarDataPlugin implements FlutterPlugin, ActivityAware, MethodCal
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-        if(call.method.equals("getCarData")) {
-            try{
-                onNewLogEntry(getWitsManager().getStatusString("mcuJson"));
-                result.success(carStatus);
-            } catch (Exception e){
-                Log.e("KswCarData","Error Fetching CarStatus manually");
-                result.error("UNAVAILABLE","Ksw services unavailable or IPC connection failed.", null);
-            }
-        } else if(call.method.equals("testCarData")) {
-            onNewLogEntry(test_data());
-        } else {
-            result.notImplemented();
+      if(call.method.equals("getCarData")) {
+        try{
+          String mcuJson = getWitsManager().getStatusString("mcuJson");
+          try{
+            onNewLogEntry(mcuJson);
+            result.success(carStatus);
+          } catch (Exception e){
+            Log.e("KswCarData","Error Parsing CarData", e);
+            result.error("UNAVAILABLE","Invalid CarData received. Error:\n"+e, null);
+          }
+        } catch (Exception e) {
+          Log.e("KswCarData","Error Fetching CarData manually", e);
+          result.error("UNAVAILABLE","Ksw services unavailable or IPC connection failed. Error:\n"+e, null);
         }
+      } else if(call.method.equals("testCarData")) {
+        onNewLogEntry(test_data());
+      } else {
+        result.notImplemented();
+      }
     }
 
     @Override
