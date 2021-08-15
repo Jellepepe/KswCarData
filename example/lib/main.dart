@@ -41,11 +41,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    int? _command;
+    int? _subCommand;
+
     return MaterialApp(
+      theme: ThemeData()..textTheme.apply(bodyColor: Colors.grey),
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.black,
         appBar: AppBar(
-          title: const Text('KswCarData CarData Plugin example app'),
+          title: const Text('KswCarData Plugin example app'),
+          toolbarHeight: 40,
         ),
         body: Builder(builder: (context) => 
           Stack(
@@ -122,55 +128,117 @@ class _MyAppState extends State<MyApp> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 20),
-                      child: StreamBuilder(
-                        stream: KswCarData.speedStream,
-                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                          if(snapshot.hasData) {
+                      Padding(
+                        padding: EdgeInsets.only(left: 20),
+                        child: StreamBuilder(
+                          stream: KswCarData.speedStream,
+                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                            if(snapshot.hasData) {
+                              return Text(
+                                'Speed: ' + snapshot.data.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                ),
+                              );
+                            }
                             return Text(
-                              'Speed: ' + snapshot.data.toString(),
+                              'Speed: Unknown',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 32,
+                                fontSize: 32
                               ),
                             );
                           }
-                          return Text(
-                            'Speed: Unknown',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32
-                            ),
-                          );
-                        }
-                      )
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 20),
-                      child: StreamBuilder(
-                        stream: KswCarData.rpmStream,
-                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                          if(snapshot.hasData) {
+                        )
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 20),
+                        child: StreamBuilder(
+                          stream: KswCarData.rpmStream,
+                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                            if(snapshot.hasData) {
+                              return Text(
+                                'RPM: ' + snapshot.data.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                ),
+                              );
+                            }
                             return Text(
-                              'RPM: ' + snapshot.data.toString(),
+                              'RPM: Unknown',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 32,
+                                fontSize: 32
                               ),
                             );
                           }
-                          return Text(
-                            'RPM: Unknown',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32
+                        )
+                      ),
+                      Spacer(),
+                      Container(
+                        width: 150,
+                        margin: EdgeInsets.only(top: 7, left: 20),
+                        child: TextField(
+                          maxLength: 1,
+                          onChanged: (value) => _command = int.tryParse(value),
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                            border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            labelText: 'Command',
+                            labelStyle: TextStyle(
+                              color: Colors.white
+                            )
+                          ),
+                        )
+                      ),
+                      Container(
+                        width: 150,
+                        margin: EdgeInsets.only(top: 7, left: 20),
+                        child: TextField(
+                          maxLength: 3,
+                          onChanged: (value) => _subCommand = int.tryParse(value),
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                            border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            labelText: 'subCommand',
+                            labelStyle: TextStyle(
+                              color: Colors.white
                             ),
-                          );
+                          ),
+                        )
+                      ),
+                      IconButton(
+                        iconSize: 50,
+                        alignment: Alignment.topCenter,
+                        icon: Icon(Icons.send, color: Colors.white,size: 40,),
+                        padding: EdgeInsets.fromLTRB(8, 8, 30, 8),
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          if(_command != null && _subCommand != null) {
+                            KswCarData.customMcuCommand(_command!, _subCommand!).then((value) => ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Successfully sent command: $value"),
+                              )
+                            ));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Incomplete MCU command"),
+                              )
+                            );
+                          }
                         }
                       )
-                    ),
                     ]
                   ),
                   Row(
