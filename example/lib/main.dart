@@ -58,6 +58,40 @@ class _MyAppState extends State<MyApp> {
                     IconButton(
                       color: Colors.white,
                       iconSize: 64,
+                      icon: Icon(Icons.cancel_presentation),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Turning off Screen"),
+                          )
+                        );
+                        KswCarData.sendMcuCommand(McuCommand.TURN_OFF_SCREEN).then((value) => ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Successfully sent command: $value"),
+                          )
+                        ));
+                      }
+                    ),
+                    IconButton(
+                      color: Colors.white,
+                      iconSize: 64,
+                      icon: Icon(Icons.directions_car),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Switching to OEM"),
+                          )
+                        );
+                        KswCarData.sendMcuCommand(McuCommand.SWITCH_TO_OEM).then((value) => ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Successfully sent command: $value"),
+                          )
+                        ));
+                      }
+                    ),
+                    IconButton(
+                      color: Colors.white,
+                      iconSize: 64,
                       icon: Icon(Icons.warning),
                       onPressed: () {
                         _testCarStatus();

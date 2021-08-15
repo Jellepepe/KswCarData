@@ -62,7 +62,7 @@ public class KswCarDataPlugin implements FlutterPlugin, ActivityAware, MethodCal
         @Override
         public void updateStatusInfo(String statusInfo) {
             if (!statusInfo.isEmpty() && Character.getNumericValue(statusInfo.charAt(statusInfo.length()-2)) == 5) {
-                onNewLogEntry(statusInfo.substring(12, statusInfo.length()-11));
+              onNewLogEntry(statusInfo.substring(12, statusInfo.length()-11));
             }
         }
     };
@@ -145,6 +145,21 @@ public class KswCarDataPlugin implements FlutterPlugin, ActivityAware, MethodCal
         }
       } else if(call.method.equals("testCarData")) {
         onNewLogEntry(test_data());
+      } else if(call.method.equals("sendCommand")) {
+        try{
+          final String commandJson = call.argument("commandJson");
+          boolean success = getWitsManager().sendCommand(commandJson);
+          if(success) {
+            Log.i("KswCarData","Ksw MCU command sent. Command:\n" + commandJson);
+            result.success(true);
+          } else {
+            Log.e("KswCarData","Ksw MCU command failed. Command:\n" + commandJson);
+            result.error("UNAVAILABLE", "Ksw MCU command failed", null);
+          }
+        } catch (Exception e) {
+          Log.e("KswCarData","Error Sending MCU command", e);
+          result.error("UNAVAILABLE","Ksw services unavailable or IPC connection failed. Error:\n"+e, null);
+        }
       } else {
         result.notImplemented();
       }

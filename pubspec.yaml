@@ -1,6 +1,6 @@
 name: kswcardata
-description: Read Live car data on KSW-android car headunits.
-version: 0.5.0
+description: Interact with Mcu using AIDL on KSW-android car headunits.
+version: 0.6.0
 author: Jellepepe
 homepage: byme.dev/kswcardata
 

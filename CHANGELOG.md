@@ -1,4 +1,8 @@
-## 0.4.1
+## 0.6.0
+- Implement McuCommand class
+- Add support for sending Mcu Commands
+
+## 0.5.0
 - Actually use .aidl files properly
 - Bugfixes for null-safety
 - More robust error handling

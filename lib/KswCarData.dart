@@ -6,6 +6,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:kswcardata/mcu_command.dart';
+
+export 'package:kswcardata/mcu_command.dart';
 
 /// Plugin for fetching the app logs
 class KswCarData {
@@ -46,6 +49,26 @@ class KswCarData {
       return CarData.failed("Failed to get car status: '${e.message}'.");
     }
   }
+
+  static Future<bool> sendMcuCommand(McuCommand command) async {
+    try{
+      return (await _methodChannel.invokeMethod('sendCommand', {'commandJson':command.commandJson}) ?? false);
+    } catch (e) {
+      print("Failed to send MCU command: '${e.toString()}'.");
+      return false;
+    }
+  }
+
+  static Future<bool> customMcuCommand(int command, int subCommand, {String? arg}) async {
+    try{
+      String mcuCommand = '{"command":'+command.toString()+',"subCommand":'+subCommand.toString()+'}';
+      return (await _methodChannel.invokeMethod('sendCommand', {'commandJson':mcuCommand}) ?? false);
+    } catch (e) {
+      print("Failed to send MCU command: '${e.toString()}'.");
+      return false;
+    }
+  }
+
 }
 
 class CarData {
