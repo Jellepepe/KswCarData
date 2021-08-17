@@ -9,6 +9,7 @@ import 'package:kswcardata/kswcardata.dart';
 enum McuCommand {
   SWITCH_TO_OEM,
   TURN_OFF_SCREEN,
+  HOME_BUTTON,
   NOTHING
 }
 
@@ -17,16 +18,19 @@ extension McuCommandExtension on McuCommand {
   int get command {switch(this) {
     case McuCommand.SWITCH_TO_OEM: return 1;
     case McuCommand.TURN_OFF_SCREEN: return 1;
+    case McuCommand.HOME_BUTTON: return 1;
     case McuCommand.NOTHING: return 0;
   }}
   int get subCommand {switch(this) {
     case McuCommand.SWITCH_TO_OEM: return 601;
     case McuCommand.TURN_OFF_SCREEN: return 113;
+    case McuCommand.HOME_BUTTON: return 114;
     case McuCommand.NOTHING: return 0;
   }}
   IconData get icon {switch(this) {
     case McuCommand.SWITCH_TO_OEM: return Icons.directions_car;
     case McuCommand.TURN_OFF_SCREEN: return Icons.cancel_presentation;
+    case McuCommand.HOME_BUTTON: return Icons.home;
     case McuCommand.NOTHING: return Icons.close;
   }}
 
