@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:math';
 
-import 'package:kswcardata/kswcardata.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:kswcardata/kswcardata.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  CarData _carStatus = CarData.failed("Empty");
+  CarData _carStatus = CarData.failed('EMPTY','CarStatus NotInitialised');
   final random = Random();
 
   @override

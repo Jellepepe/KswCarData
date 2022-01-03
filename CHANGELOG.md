@@ -1,3 +1,7 @@
+## 0.7.0
+- Properly provide error reason
+- State property to see if ksw services are available
+
 ## 0.6.0
 - Implement McuCommand class
 - Add support for sending Mcu Commands

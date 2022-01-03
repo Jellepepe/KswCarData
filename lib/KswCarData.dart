@@ -37,8 +37,10 @@ class KswCarData {
   static Future<CarData> getCarData() async {
     try {
       return CarData.fromJson(jsonDecode(await _methodChannel.invokeMethod('getCarData')));
+    } on PlatformException catch (e) {
+      return CarData.failed(e.code, e.message ?? '');
     } catch (e) {
-      return CarData.failed("Failed to get car status: '${e.toString()}'.");
+      return CarData.failed('INVALID', "Failed to get car status: '$e'.");
     }
   }
 
@@ -46,7 +48,9 @@ class KswCarData {
     try {
       return CarData.fromJson(await _methodChannel.invokeMethod('testCarData'));
     } on PlatformException catch (e) {
-      return CarData.failed("Failed to get car status: '${e.message}'.");
+      return CarData.failed(e.code, e.message ?? '');
+    } catch (e) {
+      return CarData.failed('INVALID', "Failed to get car status: '$e'.");
     }
   }
 
@@ -71,6 +75,14 @@ class KswCarData {
 
 }
 
+enum CarDataState {
+  VALID,
+  INVALID,
+  UNAVAILABLE,
+  EMPTY,
+  UNKNOWN
+}
+
 class CarData {
   static const int BONNET = 8;
   static const int BOOT = 4;
@@ -82,6 +94,7 @@ class CarData {
   bool isOpen(int door) => (cardoor! & door) != 0; 
 
   String error = 'Empty';
+  CarDataState state = CarDataState.EMPTY;
   double? temperature;
   double? averageSpeed;
   int? cardoor;
@@ -101,9 +114,11 @@ class CarData {
   CarData.fromJson(dynamic json) {
     if(json == null) {
       this.error = "Received null from native side.";
+      this.state = CarDataState.INVALID;
     } else {
       dynamic carStatus = json['carData'];
       this.error = "";
+      this.state = CarDataState.VALID;
       try {
         this.temperature   = carStatus['airTemperature'] as double?;
         this.averageSpeed  = carStatus['averSpeed'] as double?;
@@ -122,6 +137,7 @@ class CarData {
         this.btStatus      = (json['bluetooth'] as int?) == 1;
       } catch(e) {
         this.error = "Incomplete carData, error was:\n" + e.toString();
+        this.state = CarDataState.INVALID;
       }
     }
     assert(() {
@@ -130,18 +146,27 @@ class CarData {
     }());
   }
 
-  CarData.failed(String error) {
+  CarData.failed(String code, String error) {
     this.error = error;
-  }
-
-  bool failed() {
-    return error.length > 0;
+    switch (code) {
+      case 'UNAVAILABLE':
+        this.state = CarDataState.UNAVAILABLE;
+        break;
+      case 'INVALID':
+        this.state = CarDataState.INVALID;
+        break;
+      case 'EMPTY':
+        this.state = CarDataState.EMPTY;
+        break;
+      default:
+        this.state = CarDataState.UNKNOWN;
+    }
   }
 
   @override
   String toString() {
-    if(failed()) {
-      return "No car data available. Error:\n" + error;
+    if(state != CarDataState.VALID) {
+      return "No car data available. State: ${state.toString().split('.').last} Error:\n" + error;
     } else {
       return "Car Data:\n"
         + "Outside Temperature: " + this.temperature.toString() + '\n'

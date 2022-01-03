@@ -1,7 +1,6 @@
 name: kswcardata
 description: Interact with Mcu using AIDL on KSW-android car headunits.
-version: 0.6.0
-author: Jellepepe
+version: 0.7.0
 homepage: byme.dev/kswcardata
 
 environment:
