@@ -11,6 +11,7 @@ enum McuCommand {
   TURN_OFF_SCREEN,
   HOME_BUTTON,
   REBOOT,
+  OPEN_AUX,
   NOTHING
 }
 
@@ -21,6 +22,7 @@ extension McuCommandExtension on McuCommand {
     case McuCommand.TURN_OFF_SCREEN: return 1;
     case McuCommand.HOME_BUTTON: return 1;
     case McuCommand.REBOOT: return 1;
+    case McuCommand.OPEN_AUX: return 1;
     case McuCommand.NOTHING: return 0;
   }}
   int get subCommand {switch(this) {
@@ -28,6 +30,7 @@ extension McuCommandExtension on McuCommand {
     case McuCommand.TURN_OFF_SCREEN: return 113;
     case McuCommand.HOME_BUTTON: return 114;
     case McuCommand.REBOOT: return 125;
+    case McuCommand.OPEN_AUX: return 605;
     case McuCommand.NOTHING: return 0;
   }}
   IconData get icon {switch(this) {
@@ -35,6 +38,7 @@ extension McuCommandExtension on McuCommand {
     case McuCommand.TURN_OFF_SCREEN: return Icons.cancel_presentation;
     case McuCommand.HOME_BUTTON: return Icons.home;
     case McuCommand.REBOOT: return Icons.restart_alt;
+    case McuCommand.OPEN_AUX: return Icons.settings_input_component;
     case McuCommand.NOTHING: return Icons.close;
   }}
 
