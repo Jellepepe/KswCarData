@@ -23,7 +23,12 @@ class KswCarData {
   }
 
   static Stream<CarData> get carDataStream {
-    return _rawCarDataStream.map((cardata) => CarData.fromJson(jsonDecode(cardata)));
+    return _rawCarDataStream.map((cardata) {
+      try{
+        return CarData.fromJson(jsonDecode(cardata));
+      } catch(e) {
+        return CarData.failed('INVALID', "Failed to get car status: '$e'.");
+      }});
   }
 
   static Stream<int?> get speedStream {
