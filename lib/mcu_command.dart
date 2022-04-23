@@ -54,9 +54,9 @@ extension McuCommandExtension on McuCommand {
     case McuCommand.NOTHING: return Icons.close;
   }}
 
-  String get commandJson => this.arg != null 
+  String get commandJson => this.arg == null 
     ? '{"command":'+this.command.toString()+',"subCommand":'+this.subCommand.toString()+'}'
-    : '{"command":'+this.command.toString()+',"subCommand":'+this.subCommand.toString()+',"jsonArg":'+(this.arg??'')+'}';
+    : '{"command":'+this.command.toString()+',"subCommand":'+this.subCommand.toString()+',"jsonArg":"'+(this.arg??'')+'"}';
 
   Future<bool> launch() async {
     if(this != McuCommand.NOTHING) 
