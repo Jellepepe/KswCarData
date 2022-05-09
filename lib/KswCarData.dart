@@ -23,9 +23,9 @@ class KswCarData {
   }
 
   static Stream<CarData> get carDataStream {
-    return _rawCarDataStream.map((cardata) {
+    return _rawCarDataStream.map((rawCarData) {
       try{
-        return CarData.fromJson(jsonDecode(cardata));
+        return CarData.fromJson(jsonDecode(rawCarData));
       } catch(e) {
         return CarData.failed('INVALID', "Failed to get car status: '$e'.");
       }});
@@ -114,6 +114,7 @@ class CarData {
   int? speed;
   int? tempUnit;
   String? mcuVersion;
+  int? systemMode;
   bool btStatus = false;
 
   CarData.fromJson(dynamic json) {
@@ -139,16 +140,14 @@ class CarData {
         this.speed         = carStatus['speed'] as int?;
         this.tempUnit      = carStatus['temperatureUnitType'] as int?;
         this.mcuVersion    = json['mcuVerison'] as String?;
+        this.systemMode    = json['systemMode'] as int?;
         this.btStatus      = (json['bluetooth'] as int?) == 1;
       } catch(e) {
         this.error = "Incomplete carData, error was:\n" + e.toString();
         this.state = CarDataState.INVALID;
       }
     }
-    assert(() {
-      print("Parsed CarData from Json: " + this.toString());
-      return true;
-    }());
+    //print("Parsed CarData from Json: " + this.toString());
   }
 
   CarData.failed(String code, String error) {
