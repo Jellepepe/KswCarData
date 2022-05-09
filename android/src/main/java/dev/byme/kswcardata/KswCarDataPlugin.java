@@ -132,12 +132,16 @@ public class KswCarDataPlugin implements FlutterPlugin, ActivityAware, MethodCal
       if(call.method.equals("getCarData")) {
         try{
           String mcuJson = getWitsManager().getStatusString("mcuJson");
-          try{
-            onNewLogEntry(mcuJson);
-            result.success(carStatus);
-          } catch (Exception e){
-            Log.e("KswCarData","Error Parsing CarData", e);
-            result.error("INVALID","Invalid CarData received. Error:\n"+e, null);
+          if(mcuJson == null) {
+            result.error("INVALID","Empty CarData received.", null);
+          } else {
+            try{
+              onNewLogEntry(mcuJson);
+              result.success(carStatus);
+            } catch (Exception e){
+              Log.e("KswCarData","Error Parsing CarData", e);
+              result.error("INVALID","Invalid CarData received. Error:\n"+e, null);
+            }
           }
         } catch (Exception e) {
           Log.e("KswCarData","Error Fetching CarData manually", e);
