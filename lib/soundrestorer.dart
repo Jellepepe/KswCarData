@@ -17,33 +17,33 @@ class SoundRestorer {
   static Future<bool> restore() => McuCommand.SOUND_RESTORE.launch();
 
   factory SoundRestorer({void Function(bool)? restoreCallback}) {
-    if(restoreCallback != null) {
+    if (restoreCallback != null) {
       _instance.callback = restoreCallback;
     }
     return _instance;
   }
 
   void enable() {
-    if(systemModeSubscription == null) {
+    if (systemModeSubscription == null) {
       systemModeSubscription = KswCarData.carDataStream.listen((carData) {
-        if(carData.systemMode != null && systemMode != carData.systemMode) {
+        if (carData.systemMode != null && systemMode != carData.systemMode) {
           systemMode = carData.systemMode!;
-          if(systemMode == 1) {
+          if (systemMode == 1) {
             restore().then((success) => callback != null ? callback!(success) : {});
           }
         }
       });
-      debugPrint("Soundrestorer Service Enabled!");
+      debugPrint('Soundrestorer Service Enabled!');
     }
   }
 
   void disable() {
-    if(systemModeSubscription != null) {
+    if (systemModeSubscription != null) {
       systemModeSubscription?.cancel();
       systemModeSubscription = null;
-      debugPrint("Soundrestorer Service Disabled!");
+      debugPrint('Soundrestorer Service Disabled!');
     }
   }
- 
+
   SoundRestorer._internal();
 }

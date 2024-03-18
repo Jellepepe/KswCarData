@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:kswcardata/mcu_command.dart';
 
@@ -12,11 +13,11 @@ export 'package:kswcardata/mcu_command.dart';
 
 /// Plugin for fetching the app logs
 class KswCarData {
-  static const _methodChannel = const MethodChannel('dev.byme.kswcardata');
+  static const _methodChannel = MethodChannel('dev.byme.kswcardata');
 
-  static const _carDataChannel = const EventChannel('dev.byme.kswcardata/carStream');
+  static const _carDataChannel = EventChannel('dev.byme.kswcardata/carStream');
 
-  static Stream<dynamic> _rawCarDataStream = _carDataChannel.receiveBroadcastStream(1);
+  static final Stream<dynamic> _rawCarDataStream = _carDataChannel.receiveBroadcastStream(1);
 
   static Stream<dynamic> get rawCarDataStream {
     return _rawCarDataStream;
@@ -24,11 +25,12 @@ class KswCarData {
 
   static Stream<CarData> get carDataStream {
     return _rawCarDataStream.map((rawCarData) {
-      try{
+      try {
         return CarData.fromJson(jsonDecode(rawCarData));
-      } catch(e) {
+      } catch (e) {
         return CarData.failed('INVALID', "Failed to get car status: '$e'.");
-      }});
+      }
+    });
   }
 
   static Stream<int?> get speedStream {
@@ -60,33 +62,26 @@ class KswCarData {
   }
 
   static Future<bool> sendMcuCommand(McuCommand command) async {
-    try{
-      return (await _methodChannel.invokeMethod('sendCommand', {'commandJson':command.commandJson}) ?? false);
+    try {
+      return (await _methodChannel.invokeMethod('sendCommand', {'commandJson': command.commandJson}) ?? false);
     } catch (e) {
-      print("Failed to send MCU command: '${e.toString()}'.");
+      debugPrint("Failed to send MCU command: '${e.toString()}'.");
       return false;
     }
   }
 
   static Future<bool> customMcuCommand(int command, int subCommand, {String? arg}) async {
-    try{
-      String mcuCommand = '{"command":'+command.toString()+',"subCommand":'+subCommand.toString()+'}';
-      return (await _methodChannel.invokeMethod('sendCommand', {'commandJson':mcuCommand}) ?? false);
+    try {
+      String mcuCommand = '{"command":$command,"subCommand":$subCommand}';
+      return (await _methodChannel.invokeMethod('sendCommand', {'commandJson': mcuCommand}) ?? false);
     } catch (e) {
-      print("Failed to send MCU command: '${e.toString()}'.");
+      debugPrint("Failed to send MCU command: '${e.toString()}'.");
       return false;
     }
   }
-
 }
 
-enum CarDataState {
-  VALID,
-  INVALID,
-  UNAVAILABLE,
-  EMPTY,
-  UNKNOWN
-}
+enum CarDataState { VALID, INVALID, UNAVAILABLE, EMPTY, UNKNOWN }
 
 class CarData {
   static const int BONNET = 8;
@@ -96,7 +91,7 @@ class CarData {
   static const int REAR_LEFT = 64;
   static const int REAR_RIGHT = 128;
 
-  bool isOpen(int door) => (cardoor! & door) != 0; 
+  bool isOpen(int door) => (cardoor! & door) != 0;
 
   String error = 'Empty';
   CarDataState state = CarDataState.EMPTY;
@@ -105,9 +100,9 @@ class CarData {
   int? cardoor;
   int? distanceUnit;
   int? rpm;
-  bool handbrake = false; 
+  bool handbrake = false;
   int? range;
-  int? fuel; 
+  int? fuel;
   int? fuelUnit;
   double? consumption;
   bool seatbelt = true;
@@ -118,83 +113,60 @@ class CarData {
   bool btStatus = false;
 
   CarData.fromJson(dynamic json) {
-    if(json == null) {
-      this.error = "Received null from native side.";
-      this.state = CarDataState.INVALID;
+    if (json == null) {
+      error = 'Received null from native side.';
+      state = CarDataState.INVALID;
     } else {
       dynamic carStatus = json['carData'];
-      this.error = "";
-      this.state = CarDataState.VALID;
+      error = '';
+      state = CarDataState.VALID;
       try {
-        this.temperature   = carStatus['airTemperature'] as double?;
-        this.averageSpeed  = carStatus['averSpeed'] as double?;
-        this.cardoor       = carStatus['carDoor'] as int?;
-        this.distanceUnit  = carStatus['distanceUnitType'] as int?;
-        this.rpm           = carStatus['engineTurnS'] as int?;
-        this.handbrake     = carStatus['handbrake'] as bool;
-        this.range         = carStatus['mileage'] as int?;
-        this.fuel          = carStatus['oilSum'] as int?;
-        this.fuelUnit      = carStatus['oilUnitType'] as int?;
-        this.consumption   = carStatus['oilWear'] as double?;
-        this.seatbelt      = carStatus['safetyBelt'] as bool;
-        this.speed         = carStatus['speed'] as int?;
-        this.tempUnit      = carStatus['temperatureUnitType'] as int?;
-        this.mcuVersion    = json['mcuVerison'] as String?;
-        this.systemMode    = json['systemMode'] as int?;
-        this.btStatus      = (json['bluetooth'] as int?) == 1;
-      } catch(e) {
-        this.error = "Incomplete carData, error was:\n" + e.toString();
-        this.state = CarDataState.INVALID;
+        temperature = carStatus['airTemperature'] as double?;
+        averageSpeed = carStatus['averSpeed'] as double?;
+        cardoor = carStatus['carDoor'] as int?;
+        distanceUnit = carStatus['distanceUnitType'] as int?;
+        rpm = carStatus['engineTurnS'] as int?;
+        handbrake = carStatus['handbrake'] as bool;
+        range = carStatus['mileage'] as int?;
+        fuel = carStatus['oilSum'] as int?;
+        fuelUnit = carStatus['oilUnitType'] as int?;
+        consumption = carStatus['oilWear'] as double?;
+        seatbelt = carStatus['safetyBelt'] as bool;
+        speed = carStatus['speed'] as int?;
+        tempUnit = carStatus['temperatureUnitType'] as int?;
+        mcuVersion = json['mcuVerison'] as String?;
+        systemMode = json['systemMode'] as int?;
+        btStatus = (json['bluetooth'] as int?) == 1;
+      } catch (e) {
+        error = 'Incomplete carData, error was:\n$e';
+        state = CarDataState.INVALID;
       }
     }
     //print("Parsed CarData from Json: " + this.toString());
   }
 
-  CarData.failed(String code, String error) {
-    this.error = error;
+  CarData.failed(String code, this.error) {
     switch (code) {
       case 'UNAVAILABLE':
-        this.state = CarDataState.UNAVAILABLE;
+        state = CarDataState.UNAVAILABLE;
         break;
       case 'INVALID':
-        this.state = CarDataState.INVALID;
+        state = CarDataState.INVALID;
         break;
       case 'EMPTY':
-        this.state = CarDataState.EMPTY;
+        state = CarDataState.EMPTY;
         break;
       default:
-        this.state = CarDataState.UNKNOWN;
+        state = CarDataState.UNKNOWN;
     }
   }
 
   @override
   String toString() {
-    if(state != CarDataState.VALID) {
-      return "No car data available. State: ${state.toString().split('.').last} Error:\n" + error;
+    if (state != CarDataState.VALID) {
+      return "No car data available. State: ${state.toString().split('.').last} Error:\n$error";
     } else {
-      return "Car Data:\n"
-        + "Outside Temperature: " + this.temperature.toString() + '\n'
-        + "Average Speed: " + this.averageSpeed.toString() + '\n'
-        + "Open Car Doors: "
-        + (isOpen(BONNET) ? 'Bonnet ' : '')
-        + (isOpen(FRONT_LEFT) ? 'Front Left ' : '')
-        + (isOpen(FRONT_RIGHT) ? 'Front Right ' : '')
-        + (isOpen(REAR_LEFT) ? 'Rear Left ' : '')
-        + (isOpen(REAR_RIGHT) ? 'Rear Right ' : '')
-        + (isOpen(BOOT) ? 'Boot ' : '')
-        + '\n'
-        + "Distance Unit: " + this.distanceUnit.toString() + '\n'
-        + "RPM: " + this.rpm.toString() + '\n'
-        + "Handbrake on: " + this.handbrake.toString() + '\n'
-        + "Range: " + this.range.toString() + '\n'
-        + "Fuel Tank Contents: " + this.fuel.toString() + '\n'
-        + "Fuel Unit: " + this.fuelUnit.toString() + '\n'
-        + "Fuel Consumption: " + this.consumption.toString() + '\n'
-        + "Seatbelt on: " + this.seatbelt.toString() + '\n'
-        + "Speed: " + this.speed.toString() + '\n'
-        + "Temperature Unit: " + this.tempUnit.toString() + '\n'
-        + "MCU Version: " + this.mcuVersion.toString() + '\n'
-        + "Bluetooth status: " + this.btStatus.toString() +'\n';
+      return 'Car Data:\nOutside Temperature: $temperature\nAverage Speed: $averageSpeed\nOpen Car Doors: ${isOpen(BONNET) ? 'Bonnet ' : ''}${isOpen(FRONT_LEFT) ? 'Front Left ' : ''}${isOpen(FRONT_RIGHT) ? 'Front Right ' : ''}${isOpen(REAR_LEFT) ? 'Rear Left ' : ''}${isOpen(REAR_RIGHT) ? 'Rear Right ' : ''}${isOpen(BOOT) ? 'Boot ' : ''}\nDistance Unit: $distanceUnit\nRPM: $rpm\nHandbrake on: $handbrake\nRange: $range\nFuel Tank Contents: $fuel\nFuel Unit: $fuelUnit\nFuel Consumption: $consumption\nSeatbelt on: $seatbelt\nSpeed: $speed\nTemperature Unit: $tempUnit\nMCU Version: $mcuVersion\nBluetooth status: $btStatus\n';
     }
   }
 }
