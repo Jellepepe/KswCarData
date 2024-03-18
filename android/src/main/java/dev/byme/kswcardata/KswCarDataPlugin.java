@@ -144,7 +144,7 @@ public class KswCarDataPlugin implements FlutterPlugin, ActivityAware, MethodCal
             }
           }
         } catch (Exception e) {
-          Log.e("KswCarData","Error Fetching CarData manually", e);
+          //Log.e("KswCarData","Error Fetching CarData manually", e);
           result.error("UNAVAILABLE","Ksw services unavailable or IPC connection failed. Error:\n"+e, null);
         }
       } else if(call.method.equals("testCarData")) {
